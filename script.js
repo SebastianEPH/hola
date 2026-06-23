@@ -1,66 +1,34 @@
 const GOOGLE_APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec";
 
-const form = document.querySelector("#postia-form");
+const form = document.querySelector("#earlyAccessForm");
 const statusMessage = document.querySelector("#formStatus");
-const hiddenIframe = document.querySelector("#postia-hidden-iframe");
 
 if (!form) {
-  console.error("No se encontró el formulario con id #postia-form");
+  console.error("No se encontró el formulario con id #earlyAccessForm");
 }
 
 if (!statusMessage) {
   console.error("No se encontró el elemento con id #formStatus");
 }
 
-if (!hiddenIframe) {
-  console.error("No se encontró el iframe con id #postia-hidden-iframe");
-}
-
-if (form && statusMessage && hiddenIframe) {
-  form.method = "POST";
-  form.action = GOOGLE_APPS_SCRIPT_URL;
-  form.target = "postia-hidden-iframe";
-  form.enctype = "application/x-www-form-urlencoded";
-
-  hiddenIframe.addEventListener("load", () => {
-    const isSubmitting = form.dataset.submitting === "true";
-
-    if (!isSubmitting) {
-      return;
-    }
-
-    form.dataset.submitting = "false";
-
-    statusMessage.className = "form-status success";
-    statusMessage.textContent = "Done. We will contact you soon.";
-
-    form.reset();
+if (form && statusMessage) {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
     const submitButton = form.querySelector('button[type="submit"]');
 
-    if (submitButton) {
-      submitButton.disabled = false;
-      submitButton.textContent = "Reserve my access";
-    }
-  });
-
-  form.addEventListener("submit", () => {
-    const nombreInput = form.querySelector('[name="nombre"]');
-    const empresaInput = form.querySelector('[name="empresa"]');
-    const tipoNegocioInput = form.querySelector('[name="tipo_negocio"]');
-    const submitButton = form.querySelector('button[type="submit"]');
-
-    const payloadDebug = {
-      nombre: nombreInput?.value ?? "",
-      empresa: empresaInput?.value ?? "",
-      tipo_negocio: tipoNegocioInput?.value ?? "",
+    const payload = {
+      nombre: form.elements.name.value.trim(),
+      empresa: form.elements.business.value.trim(),
+      telefono: form.elements.phone.value.trim(),
+      email: form.elements.email.value.trim(),
+      tipo_negocio: form.elements.socialManagement.value.trim(),
+      submittedAt: new Date().toISOString(),
     };
 
-    console.log("Enviando POST x-www-form-urlencoded a Google Apps Script:");
-    console.table(payloadDebug);
-
-    form.dataset.submitting = "true";
+    console.log("Enviando JSON raw:");
+    console.table(payload);
 
     statusMessage.className = "form-status";
     statusMessage.textContent = "Sending your request...";
@@ -68,6 +36,45 @@ if (form && statusMessage && hiddenIframe) {
     if (submitButton) {
       submitButton.disabled = true;
       submitButton.textContent = "Sending...";
+    }
+
+    try {
+      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        redirect: "follow",
+      });
+
+      const responseText = await response.text();
+
+      console.log("Status:", response.status);
+      console.log("Redirected:", response.redirected);
+      console.log("Response URL:", response.url);
+      console.log("Response body:", responseText);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${responseText}`);
+      }
+
+      statusMessage.classList.add("success");
+      statusMessage.textContent =
+        responseText.trim() || "Done. We will contact you soon.";
+
+      form.reset();
+    } catch (error) {
+      console.error("Error enviando formulario:", error);
+
+      statusMessage.classList.add("error");
+      statusMessage.textContent =
+        "No se pudo enviar la solicitud. Revisa la consola para ver el error.";
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Reserve my access";
+      }
     }
   });
 }
