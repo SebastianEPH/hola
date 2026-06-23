@@ -1,72 +1,71 @@
-const ENDPOINT_URL =
-    "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec"
+const GOOGLE_APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec";
 
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("#postia-form")
-    const message = document.querySelector("#postia-message")
-    const submitButton = document.querySelector("#postia-submit")
+console.log("script.js cargado correctamente");
 
-    if (!form) {
-        console.error("No se encontró el formulario con id #postia-form")
-        return
+const form = document.querySelector("#earlyAccessForm");
+const statusMessage = document.querySelector("#formStatus");
+
+console.log({
+  form,
+  statusMessage,
+});
+
+if (!form || !statusMessage) {
+  console.error("No se encontró el formulario o el mensaje de estado.");
+} else {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    console.log("Formulario enviado");
+
+    const formData = new FormData(form);
+
+    const payload = Object.fromEntries(formData.entries());
+
+    payload.submittedAt = new Date().toISOString();
+
+    console.log("Payload que se enviará:", payload);
+
+    statusMessage.className = "form-status";
+    statusMessage.textContent = "Sending your request...";
+
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending...";
     }
 
-    form.addEventListener("submit", async function (event) {
-        event.preventDefault()
+    try {
+      const body = new URLSearchParams(payload).toString();
 
-        console.log("POSTIA FORMULARIO EJECUTADO")
+      console.log("Body x-www-form-urlencoded:", body);
 
-        if (submitButton) {
-            submitButton.disabled = true
-            submitButton.textContent = "Enviando..."
-        }
+      await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        },
+        body,
+      });
 
-        if (message) {
-            message.textContent = ""
-        }
+      statusMessage.classList.add("success");
+      statusMessage.textContent = "Done. We will contact you soon.";
 
-        const formData = new FormData(form)
-        const body = new URLSearchParams()
+      form.reset();
+    } catch (error) {
+      console.error("Error enviando formulario:", error);
 
-        for (const [key, value] of formData.entries()) {
-            const stringValue = String(value)
-
-            console.log("Campo capturado:", key, stringValue)
-
-            body.append(key, stringValue)
-        }
-
-        console.log("BODY FINAL:", body.toString())
-
-        try {
-            await fetch(ENDPOINT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-                },
-                body: body.toString(),
-            })
-
-            form.reset()
-
-            if (message) {
-                message.textContent =
-                    "Gracias por registrarte. Hemos recibido tus datos correctamente."
-            }
-
-            console.log("Formulario enviado correctamente")
-        } catch (error) {
-            console.error("Error enviando formulario:", error)
-
-            if (message) {
-                message.textContent = "No se pudo enviar el formulario."
-            }
-        } finally {
-            if (submitButton) {
-                submitButton.disabled = false
-                submitButton.textContent = "Enviar"
-            }
-        }
-    })
-})
+      statusMessage.classList.add("error");
+      statusMessage.textContent =
+        "We could not send the request. Please try again in a moment.";
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Reserve my access";
+      }
+    }
+  });
+}
