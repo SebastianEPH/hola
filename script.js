@@ -1,87 +1,101 @@
 const GOOGLE_APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec";
 
-console.log("script.js RAW JSON cargado correctamente");
+console.log("script.js cargado: POSTIA JSON text/plain");
 
 const form = document.querySelector("#earlyAccessForm");
 const statusMessage = document.querySelector("#formStatus");
 
 if (!form) {
-  console.error("No se encontró el formulario con id #earlyAccessForm");
-} else {
-  console.log("Formulario encontrado:", form);
+  throw new Error("No se encontró el formulario con id #earlyAccessForm");
 }
 
 if (!statusMessage) {
-  console.error("No se encontró el elemento con id #formStatus");
-} else {
-  console.log("Status encontrado:", statusMessage);
+  throw new Error("No se encontró el elemento con id #formStatus");
 }
 
-if (form && statusMessage) {
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-    const submitButton = form.querySelector('button[type="submit"]');
+  const submitButton = form.querySelector('button[type="submit"]');
 
-    const payload = {
-      nombre: form.elements.name.value.trim(),
-      empresa: form.elements.business.value.trim(),
-      telefono: form.elements.phone.value.trim(),
-      email: form.elements.email.value.trim(),
-      tipo_negocio: form.elements.socialManagement.value.trim(),
-      submittedAt: new Date().toISOString(),
-    };
+  const payload = {
+    nombre: form.elements.nombre.value.trim(),
+    empresa: form.elements.empresa.value.trim(),
+    tipo_negocio: form.elements.tipo_negocio.value.trim(),
+    whatsapp: form.elements.whatsapp.value.trim(),
+    correo: form.elements.correo.value.trim(),
+    maneja_redes: form.elements.maneja_redes.value.trim(),
+  };
 
-    console.log("Payload JSON raw enviado:");
-    console.log(JSON.stringify(payload, null, 2));
+  console.log("Payload enviado:");
+  console.log(JSON.stringify(payload, null, 2));
 
-    statusMessage.className = "form-status";
-    statusMessage.textContent = "Sending your request...";
+  statusMessage.className = "form-status";
+  statusMessage.textContent = "Sending your request...";
 
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = "Sending...";
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Sending...";
+  }
+
+  try {
+    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+      method: "POST",
+
+      /*
+        Importante:
+        No usamos application/json desde navegador porque dispara preflight OPTIONS.
+        Google Apps Script Web App no responde OPTIONS correctamente.
+        Mandamos JSON real, pero como text/plain para evitar CORS/preflight.
+      */
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+
+      body: JSON.stringify(payload),
+      redirect: "follow",
+    });
+
+    const responseText = await response.text();
+
+    console.log("Response status:", response.status);
+    console.log("Response ok:", response.ok);
+    console.log("Response redirected:", response.redirected);
+    console.log("Response url:", response.url);
+    console.log("Response body:", responseText);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${responseText}`);
     }
+
+    statusMessage.classList.add("success");
 
     try {
-      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-        redirect: "follow",
-      });
+      const responseJson = JSON.parse(responseText);
 
-      const responseText = await response.text();
-
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-      console.log("Response redirected:", response.redirected);
-      console.log("Response url:", response.url);
-      console.log("Response body:", responseText);
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${responseText}`);
+      if (responseJson.ok) {
+        statusMessage.textContent =
+          responseJson.message || "Done. We will contact you soon.";
+        form.reset();
+      } else {
+        throw new Error(responseJson.error || "Respuesta inválida del servidor");
       }
-
-      statusMessage.classList.add("success");
+    } catch {
       statusMessage.textContent =
         responseText.trim() || "Done. We will contact you soon.";
-
       form.reset();
-    } catch (error) {
-      console.error("Error enviando formulario:", error);
-
-      statusMessage.classList.add("error");
-      statusMessage.textContent =
-        "No se pudo enviar la solicitud. Revisa la consola para ver el error.";
-    } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = "Reserve my access";
-      }
     }
-  });
-}
+  } catch (error) {
+    console.error("Error enviando formulario:", error);
+
+    statusMessage.classList.add("error");
+    statusMessage.textContent =
+      "No se pudo enviar la solicitud. Revisa la consola para ver el error.";
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = "Reserve my access";
+    }
+  }
+});
