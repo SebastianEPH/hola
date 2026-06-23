@@ -1,41 +1,61 @@
 const GOOGLE_APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec";
 
+console.log("script.js cargado correctamente");
+
 const form = document.querySelector("#postia-form");
 const statusMessage = document.querySelector("#formStatus");
+const hiddenIframe = document.querySelector("#postia-hidden-iframe");
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+if (!form) {
+  console.error("No se encontró el formulario con id #postia-form");
+}
 
-  const body = new URLSearchParams();
+if (!statusMessage) {
+  console.error("No se encontró el elemento con id #formStatus");
+}
 
-  body.append("nombre", form.querySelector('[name="nombre"]').value);
-  body.append("empresa", form.querySelector('[name="empresa"]').value);
-  body.append("tipo_negocio", form.querySelector('[name="tipo_negocio"]').value);
+if (!hiddenIframe) {
+  console.error("No se encontró el iframe oculto con id #postia-hidden-iframe");
+}
 
-  console.log("Enviando:", body.toString());
+if (form && statusMessage && hiddenIframe) {
+  form.setAttribute("method", "POST");
+  form.setAttribute("action", GOOGLE_APPS_SCRIPT_URL);
+  form.setAttribute("target", "postia-hidden-iframe");
+  form.setAttribute("enctype", "application/x-www-form-urlencoded");
 
-  statusMessage.className = "form-status";
-  statusMessage.textContent = "Sending your request...";
+  form.addEventListener("submit", () => {
+    const submitButton = form.querySelector('button[type="submit"]');
 
-  try {
-    await fetch(GOOGLE_APPS_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: body.toString(),
+    const nombreInput = form.querySelector('[name="nombre"]');
+    const empresaInput = form.querySelector('[name="empresa"]');
+    const tipoNegocioInput = form.querySelector('[name="tipo_negocio"]');
+
+    console.log("Enviando formulario como x-www-form-urlencoded:", {
+      nombre: nombreInput?.value,
+      empresa: empresaInput?.value,
+      tipo_negocio: tipoNegocioInput?.value,
     });
 
-    statusMessage.classList.add("success");
-    statusMessage.textContent = "Done. We will contact you soon.";
-    form.reset();
-  } catch (error) {
-    console.error("Error:", error);
+    statusMessage.className = "form-status";
+    statusMessage.textContent = "Sending your request...";
 
-    statusMessage.classList.add("error");
-    statusMessage.textContent =
-      "We could not send the request. Please try again in a moment.";
-  }
-});
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending...";
+    }
+
+    setTimeout(() => {
+      statusMessage.classList.add("success");
+      statusMessage.textContent = "Done. We will contact you soon.";
+
+      form.reset();
+
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Reserve my access";
+      }
+    }, 1500);
+  });
+}
