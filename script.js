@@ -1,72 +1,41 @@
 const GOOGLE_APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec";
 
-console.log("script.js cargado correctamente");
-
 const form = document.querySelector("#postia-form");
 const statusMessage = document.querySelector("#formStatus");
 
-if (!form) {
-  console.error("No se encontró el formulario con id #postia-form");
-}
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-if (!statusMessage) {
-  console.error("No se encontró el elemento con id #formStatus");
-}
+  const body = new URLSearchParams();
 
-if (form && statusMessage) {
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  body.append("nombre", form.querySelector('[name="nombre"]').value);
+  body.append("empresa", form.querySelector('[name="empresa"]').value);
+  body.append("tipo_negocio", form.querySelector('[name="tipo_negocio"]').value);
 
-    console.log("Formulario enviado");
+  console.log("Enviando:", body.toString());
 
-    const formData = new FormData(form);
+  statusMessage.className = "form-status";
+  statusMessage.textContent = "Sending your request...";
 
-    const payload = Object.fromEntries(formData.entries());
+  try {
+    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: body.toString(),
+    });
 
-    payload.submittedAt = new Date().toISOString();
+    statusMessage.classList.add("success");
+    statusMessage.textContent = "Done. We will contact you soon.";
+    form.reset();
+  } catch (error) {
+    console.error("Error:", error);
 
-    console.log("Payload:", payload);
-
-    statusMessage.className = "form-status";
-    statusMessage.textContent = "Sending your request...";
-
-    const submitButton = form.querySelector('button[type="submit"]');
-
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = "Sending...";
-    }
-
-    try {
-      const body = new URLSearchParams(payload).toString();
-
-      console.log("Body x-www-form-urlencoded:", body);
-
-      await fetch(GOOGLE_APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        },
-        body,
-      });
-
-      statusMessage.classList.add("success");
-      statusMessage.textContent = "Done. We will contact you soon.";
-
-      form.reset();
-    } catch (error) {
-      console.error("Error enviando formulario:", error);
-
-      statusMessage.classList.add("error");
-      statusMessage.textContent =
-        "We could not send the request. Please try again in a moment.";
-    } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = "Reserve my access";
-      }
-    }
-  });
-}
+    statusMessage.classList.add("error");
+    statusMessage.textContent =
+      "We could not send the request. Please try again in a moment.";
+  }
+});
