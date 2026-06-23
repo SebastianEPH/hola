@@ -3,17 +3,18 @@ const GOOGLE_APPS_SCRIPT_URL =
 
 console.log("script.js cargado correctamente");
 
-const form = document.querySelector("#earlyAccessForm");
+const form = document.querySelector("#postia-form");
 const statusMessage = document.querySelector("#formStatus");
 
-console.log({
-  form,
-  statusMessage,
-});
+if (!form) {
+  console.error("No se encontró el formulario con id #postia-form");
+}
 
-if (!form || !statusMessage) {
-  console.error("No se encontró el formulario o el mensaje de estado.");
-} else {
+if (!statusMessage) {
+  console.error("No se encontró el elemento con id #formStatus");
+}
+
+if (form && statusMessage) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -25,7 +26,7 @@ if (!form || !statusMessage) {
 
     payload.submittedAt = new Date().toISOString();
 
-    console.log("Payload que se enviará:", payload);
+    console.log("Payload:", payload);
 
     statusMessage.className = "form-status";
     statusMessage.textContent = "Sending your request...";
