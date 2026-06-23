@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>POSTIA GAAA333A | Smart social calendar</title>
+    <title>POSTIA | Smart social calendar</title>
     <meta
       name="description"
       content="POSTIA is a smart calendar that creates, schedules, and tracks social content for small businesses."
@@ -33,7 +33,6 @@
         <div class="hero-copy">
           <p class="eyebrow">Visual demo</p>
           <h1 id="hero-title">A smart calendar that sells for you every day.</h1>
-
           <p class="lead">
             View campaigns, AI-generated posts, and growth metrics in one place,
             before POSTIA publishes automatically.
@@ -56,14 +55,12 @@
           <div class="preview-grid">
             <article class="preview-panel">
               <h2>Calendar of publications</h2>
-
               <div class="calendar-row" aria-hidden="true">
                 <span></span>
                 <span></span>
                 <span></span>
                 <span></span>
               </div>
-
               <p>12 posts ready · 4 social networks connected</p>
             </article>
 
@@ -83,13 +80,11 @@
 
             <article class="preview-panel metrics-panel">
               <h2>Growth metrics</h2>
-
               <div class="bars" aria-hidden="true">
                 <span></span>
                 <span></span>
                 <span></span>
               </div>
-
               <p>More consistency means more visibility, conversations, and sales.</p>
             </article>
           </div>
@@ -108,7 +103,6 @@
               Small teams know they should publish every week, but content planning
               is usually the first task to be postponed.
             </p>
-
             <p>
               POSTIA turns scattered ideas, promos, and customer questions into a
               practical publishing calendar that keeps moving without daily manual work.
@@ -125,25 +119,19 @@
           <article>
             <span>01</span>
             <h3>Add your offer</h3>
-            <p>
-              Tell POSTIA what you sell, who you serve, and the promotion you want to push.
-            </p>
+            <p>Tell POSTIA what you sell, who you serve, and the promotion you want to push.</p>
           </article>
 
           <article>
             <span>02</span>
             <h3>Approve the calendar</h3>
-            <p>
-              Review captions, visuals, hashtags, and channels before anything is published.
-            </p>
+            <p>Review captions, visuals, hashtags, and channels before anything is published.</p>
           </article>
 
           <article>
             <span>03</span>
             <h3>Track growth</h3>
-            <p>
-              See what generates reach, clicks, conversations, and sales opportunities.
-            </p>
+            <p>See what generates reach, clicks, conversations, and sales opportunities.</p>
           </article>
         </div>
       </section>
@@ -151,10 +139,7 @@
       <section id="benefits" class="content-band">
         <div class="section-shell">
           <p class="eyebrow">Benefits</p>
-
-          <h2>
-            Built for businesses that need consistent content without a marketing team.
-          </h2>
+          <h2>Built for businesses that need consistent content without a marketing team.</h2>
 
           <div class="benefits-grid">
             <article>
@@ -164,16 +149,12 @@
 
             <article>
               <h3>AI that follows your goal</h3>
-              <p>
-                Generate content around sales, education, trust, launches, or seasonal campaigns.
-              </p>
+              <p>Generate content around sales, education, trust, launches, or seasonal campaigns.</p>
             </article>
 
             <article>
               <h3>Less tool-hopping</h3>
-              <p>
-                Calendar, post ideas, creative direction, and performance live in the same view.
-              </p>
+              <p>Calendar, post ideas, creative direction, and performance live in the same view.</p>
             </article>
 
             <article>
@@ -188,7 +169,6 @@
         <div class="demo-copy">
           <p class="eyebrow">Demo visual</p>
           <h2>See the week before it goes live.</h2>
-
           <p>
             Each campaign becomes a clean sequence of posts with channel, format,
             objective, and publication status.
@@ -226,19 +206,17 @@
         <div class="access-copy">
           <p class="eyebrow">Early access</p>
           <h2>Be among the first businesses to try POSTIA.</h2>
-
           <p>
             Leave your details so we can contact you, understand your current content
             workflow, and validate if POSTIA can help your business publish better.
           </p>
-
           <blockquote>
             “If your business depends on social media but you always publish later,
             you need a system that keeps showing up.”
           </blockquote>
         </div>
 
-        <form class="access-form" id="postia-form">
+        <form class="access-form" id="earlyAccessForm">
           <h2>Reserve your early access</h2>
 
           <label>
@@ -251,9 +229,32 @@
             <input name="empresa" autocomplete="organization" required />
           </label>
 
+          <div class="field-row">
+            <label>
+              Phone
+              <input name="whatsapp" autocomplete="tel" placeholder="+51 999 999 999" required />
+            </label>
+
+            <label>
+              Email
+              <input
+                name="correo"
+                type="email"
+                autocomplete="email"
+                placeholder="you@company.com"
+                required
+              />
+            </label>
+          </div>
+
           <label>
-            Business type
-            <input name="tipo_negocio" required />
+            Do you currently manage your social networks?
+            <select name="maneja_redes" required>
+              <option value="Yes, myself">Yes, myself</option>
+              <option value="Someone on my team">Someone on my team</option>
+              <option value="An agency or freelancer">An agency or freelancer</option>
+              <option value="Not consistently">Not consistently</option>
+            </select>
           </label>
 
           <button type="submit">Reserve my access</button>
@@ -264,12 +265,6 @@
 
           <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
         </form>
-
-        <iframe
-          id="postia-hidden-iframe"
-          name="postia-hidden-iframe"
-          style="display: none;"
-        ></iframe>
       </section>
     </main>
 
@@ -278,7 +273,6 @@
         <span class="brand-mark">P</span>
         <span>POSTIA</span>
       </a>
-
       <p>AI that creates, designs, and publishes content for small businesses.</p>
     </footer>
 
