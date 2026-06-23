@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>POSTIA GAAA11A | Smart social calendar</title>
+    <title>POSTIA GAAA222A | Smart social calendar</title>
     <meta
       name="description"
       content="POSTIA is a smart calendar that creates, schedules, and tracks social content for small businesses."
@@ -33,6 +33,7 @@
         <div class="hero-copy">
           <p class="eyebrow">Visual demo</p>
           <h1 id="hero-title">A smart calendar that sells for you every day.</h1>
+
           <p class="lead">
             View campaigns, AI-generated posts, and growth metrics in one place,
             before POSTIA publishes automatically.
@@ -55,12 +56,14 @@
           <div class="preview-grid">
             <article class="preview-panel">
               <h2>Calendar of publications</h2>
+
               <div class="calendar-row" aria-hidden="true">
                 <span></span>
                 <span></span>
                 <span></span>
                 <span></span>
               </div>
+
               <p>12 posts ready · 4 social networks connected</p>
             </article>
 
@@ -148,6 +151,7 @@
       <section id="benefits" class="content-band">
         <div class="section-shell">
           <p class="eyebrow">Benefits</p>
+
           <h2>
             Built for businesses that need consistent content without a marketing team.
           </h2>
@@ -247,37 +251,9 @@
             <input name="empresa" autocomplete="organization" required />
           </label>
 
-          <div class="field-row">
-            <label>
-              Phone
-              <input
-                name="telefono"
-                autocomplete="tel"
-                placeholder="+51 999 999 999"
-                required
-              />
-            </label>
-
-            <label>
-              Email
-              <input
-                name="email"
-                type="email"
-                autocomplete="email"
-                placeholder="you@company.com"
-                required
-              />
-            </label>
-          </div>
-
           <label>
-            Do you currently manage your social networks?
-            <select name="tipo_negocio" required>
-              <option value="Yes, myself">Yes, myself</option>
-              <option value="Someone on my team">Someone on my team</option>
-              <option value="An agency or freelancer">An agency or freelancer</option>
-              <option value="Not consistently">Not consistently</option>
-            </select>
+            Business type
+            <input name="tipo_negocio" required />
           </label>
 
           <button type="submit">Reserve my access</button>
@@ -288,6 +264,12 @@
 
           <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
         </form>
+
+        <iframe
+          name="postia-hidden-iframe"
+          id="postia-hidden-iframe"
+          style="display: none;"
+        ></iframe>
       </section>
     </main>
 
