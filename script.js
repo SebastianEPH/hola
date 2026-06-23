@@ -1,49 +1,69 @@
-const form = document.querySelector("#earlyAccessForm");
-const statusMessage = document.querySelector("#formStatus");
+const ENDPOINT_URL =
+    "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec"
 
-const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec";
+const form = document.querySelector("#postia-form")
+const message = document.querySelector("#postia-message")
+const submitButton = document.querySelector("#postia-submit")
 
-form.addEventListener("submit", async (event) => {
-  console.log("Entro al boton")
-  event.preventDefault();
+if (!form) {
+    console.error("No se encontró el formulario con id #postia-form")
+} else {
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault()
 
-  const formData = new FormData(form);
-  const payload = Object.fromEntries(formData.entries());
-  payload.submittedAt = new Date().toISOString();
-  console.log("este es el payload", payload)
-  statusMessage.className = "form-status";
-  statusMessage.textContent = "Sending your request...";
+        console.log("POSTIA FORMULARIO EJECUTADO")
 
-  if (!GOOGLE_APPS_SCRIPT_URL) {
-    console.table("No existe la variable",payload);
-    statusMessage.classList.add("success");
-    statusMessage.textContent =
-      "Request captured in preview mode. Add your Google Apps Script URL in script.js to send it to Sheets.";
-    form.reset();
-    return;
-  }
+        if (submitButton) {
+            submitButton.disabled = true
+            submitButton.textContent = "Enviando..."
+        }
 
-  try {
-    console.log("intenta ")
-    await fetch(GOOGLE_APPS_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        if (message) {
+            message.textContent = ""
+        }
 
-      },
-      body: JSON.stringify(payload),
-    });
+        const formData = new FormData(form)
+        const body = new URLSearchParams()
 
-    statusMessage.classList.add("success");
-    statusMessage.textContent = "Done. We will contact you soon.";
-    console.log("se reseteará")
-    form.reset();
-    
-  } catch (error) {
-    console.log("Error al enviar el formulario ")
-    statusMessage.classList.add("error");
-    statusMessage.textContent =
-      "We could not send the request. Please try again in a moment.";
-  }
-});
+        for (const [key, value] of formData.entries()) {
+            const stringValue = String(value)
+
+            console.log("Campo capturado:", key, stringValue)
+
+            body.append(key, stringValue)
+        }
+
+        console.log("BODY FINAL:", body.toString())
+
+        try {
+            await fetch(ENDPOINT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                },
+                body: body.toString(),
+            })
+
+            form.reset()
+
+            if (message) {
+                message.textContent =
+                    "Gracias por registrarte. Hemos recibido tus datos correctamente."
+            }
+
+            console.log("Formulario enviado correctamente")
+        } catch (error) {
+            console.error("Error enviando formulario:", error)
+
+            if (message) {
+                message.textContent = "No se pudo enviar el formulario."
+            }
+        } finally {
+            if (submitButton) {
+                submitButton.disabled = false
+                submitButton.textContent = "Enviar"
+            }
+        }
+    })
+}
