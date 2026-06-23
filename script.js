@@ -1,13 +1,16 @@
 const ENDPOINT_URL =
     "https://script.google.com/macros/s/AKfycbzun6MAYfdxRaBsQpC_hHLY5mPitTEPbtmjG26Eegu-cxTUWJT_kylzxUvU6zRrcI7FDw/exec"
 
-const form = document.querySelector("#postia-form")
-const message = document.querySelector("#postia-message")
-const submitButton = document.querySelector("#postia-submit")
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("#postia-form")
+    const message = document.querySelector("#postia-message")
+    const submitButton = document.querySelector("#postia-submit")
 
-if (!form) {
-    console.error("No se encontró el formulario con id #postia-form")
-} else {
+    if (!form) {
+        console.error("No se encontró el formulario con id #postia-form")
+        return
+    }
+
     form.addEventListener("submit", async function (event) {
         event.preventDefault()
 
@@ -66,4 +69,4 @@ if (!form) {
             }
         }
     })
-}
+})
